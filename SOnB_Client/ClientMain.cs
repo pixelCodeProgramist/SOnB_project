@@ -11,7 +11,7 @@ namespace SOnB.Client
             Thread[] threads = new Thread[9];
             for (int counter = 0; counter < 9; counter++)
             {
-                threads[counter] = new Thread(new ThreadStart(threadTask.DoWork))
+                threads[counter] = new Thread(() => new ThreadTask().DoWork())
                 {
                     IsBackground = true
                 };
