@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,14 +9,20 @@ namespace SOnB.Model
 {
     public class ClientThreadModelInfo
     {
-        public ClientThreadModelInfo(string clientThreadId)
+        public ClientThreadModelInfo(string socketId, Socket socket)
         {
-            ClientThreadId = clientThreadId;
+            SocketId = socketId;
+            Socket = socket;
             IsBitChangeError = false;
             IsConnectionError = false;
         }
 
-        public String ClientThreadId
+        public Socket Socket
+        {
+            get;
+            set;
+        }
+        public String SocketId
         {
             get;
             set;

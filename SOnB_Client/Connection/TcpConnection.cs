@@ -18,7 +18,11 @@ namespace SOnB.Client
             try
             {
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+<<<<<<< HEAD
                 IPAddress hostadd = IPAddress.Parse("192.168.56.1");
+=======
+                IPAddress hostadd = IPAddress.Parse("192.168.0.15");
+>>>>>>> karol
                 int port = 8000;
                 IPEndPoint EPhost = new IPEndPoint(hostadd, port);
                 _socket.Connect(EPhost);
@@ -41,7 +45,11 @@ namespace SOnB.Client
                     return ipAddress;
                 }
             }
+<<<<<<< HEAD
             return IPAddress.Parse("192.168.56.1");
+=======
+            return IPAddress.Parse("192.168.0.15");
+>>>>>>> karol
         }
         public Socket GetSocket()
         {

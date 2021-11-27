@@ -1,6 +1,8 @@
-﻿using SOnBCommunication;
+﻿using SOnB;
+using SOnB.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -8,20 +10,23 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace SOnBServer
 {
     class Server
     {
+        private const int MAX_MESSAGE_SIZE = 1024 * 1024;
         private int listnerPort;
         private int counter = 0;
         private const int MAX_CLIENTS = 10;
-        Dictionary<string, Socket> clients;
+        List<Socket> clients;
         
         public Server(string[] args)
         {
             this.listnerPort = SetPort(args[0]);
-            clients = new Dictionary<string, Socket>();
+            clients = new List<Socket>();
         }
 
         public String GetPort()
@@ -43,7 +48,7 @@ namespace SOnBServer
             }
         }
 
-        public void Start()
+        public void Start(MainWindow mainWindow)
         {
             Console.WriteLine("Starting TCP listener...");
 
@@ -51,23 +56,36 @@ namespace SOnBServer
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             socket.Bind(endpoint);
             socket.Listen(MAX_CLIENTS);
-            Communication.server = this;
-
-            Console.WriteLine(">> Server has been started");
-
-            while (true)
+            while (clients.Count() < 9)
             {
                 counter++;
                 Socket client = socket.Accept();
-                clients.Add(client.RemoteEndPoint.ToString(), client);
-                Console.WriteLine(" >> Thread No:" + Convert.ToString(counter) + " started");
+                clients.Add(client);
+                mainWindow.UpdateListOfSockets(new ClientThreadModelInfo(counter.ToString(), client));
+            }
+            foreach(Socket s in clients)
+            {
+                byte[] message = new byte[MAX_MESSAGE_SIZE];
+                try
+                {
+                    int length = s.Receive(message);
+                    String messageStr = Encoding.UTF8.GetString(message, 0, length);
+                    mainWindow.UpdateLogs(messageStr);
+                }
+                catch (SocketException ex)
+                {
+                    HandleException(ex,s);
+                    
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 
-        public void removeClient(string client)
-        {
-            clients.Remove(client);
-        }
+  
 
         public void sendMessage(Socket client, string message)
         {
@@ -80,12 +98,18 @@ namespace SOnBServer
             try
             {
                 for (int i = 0; i < clients.Count; i++)
-                    sendMessage(clients.ElementAt(i).Value, message);
+                    sendMessage(clients[i], message);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+
+        private void HandleException(Exception ex, Socket s)
+        {
+            clients.Remove(s);
+            
         }
 
     }
