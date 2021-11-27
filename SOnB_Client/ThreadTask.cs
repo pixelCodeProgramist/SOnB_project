@@ -1,9 +1,5 @@
 ﻿using Connection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOnB.Client
 {
@@ -11,26 +7,23 @@ namespace SOnB.Client
     {
         TcpConnection tcpConnection;
         ResponseMessage responseMessage;
-        CRCAlgorithm crcAlgorithm;
 
        public ThreadTask() {
             tcpConnection = new TcpConnection();
             responseMessage = new ResponseMessage();
-            crcAlgorithm = new CRCAlgorithm();
         }
 
-       public void doWork() {
-            if (tcpConnection.connect()){
+       public void DoWork() {
+            if (tcpConnection.Connect()){
                 Console.WriteLine("Connection");
                 responseMessage = tcpConnection.ReceiveMessage();
-                if (crcAlgorithm.computeCRC(responseMessage.Message))
+                if (CRCAlgorithm.ComputeCRC(responseMessage.Message))
                     tcpConnection.Send("CRC Passed");
                 else
                     tcpConnection.Send("CRC Error");
             }
-            else {
+            else
                 Console.WriteLine("Connection error");
-            }
         }
     }
 }

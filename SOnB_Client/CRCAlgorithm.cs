@@ -8,57 +8,64 @@ namespace SOnB.Client
 {
    public class CRCAlgorithm
     {
-        static string divaider = "11000000000000101";
+        private static readonly string _divider = "11000000000000101";
 
-        static string xor(string message, string divider, ref int pos, string output)
+        private static string Xor(string message, ref int position, string input)
         {
-            string tempOutput = "";
-            for (int i = 0; i < divider.Length; i++)
+            string output = "";
+            for (int i = 0; i < _divider.Length; i++)
             {
-                if (divider[i] == output[i]) tempOutput += "0";
-                else tempOutput += "1";
+                if (IsBitsEqual(_divider[i], input[i])) output += "0";
+                else output += "1";
             }
 
-            int zerosNumber = countZeroPrefix(tempOutput);
-            if (output != divider)
-                tempOutput = tempOutput.Substring(zerosNumber, tempOutput.Length - zerosNumber);
-            if (pos != message.Length)
-            {
-                if ((pos + zerosNumber) <= message.Length)
-                    tempOutput += message.Substring(pos, zerosNumber);
-                else
-                {
-                    tempOutput += message.Substring(pos, message.Length - pos);
-                }
-            }
-            pos += zerosNumber;
-           // Console.WriteLine(tempOutput);
-            return tempOutput;
+            int zerosNumber = CountZeroPrefix(output);
+            output = output.Substring(zerosNumber);
+            if (!IsDividingEnded(position + zerosNumber, message.Length))
+                output += message.Substring(position, zerosNumber);
+            else
+                output += message.Substring(position, message.Length - position);
+            position += zerosNumber;
+            return output;
         }
 
-        static int countZeroPrefix(string str)
+        private static bool IsBitsEqual(char firstBit, char secondBit)
+        {
+            return firstBit == secondBit;
+        }
+
+        private static int CountZeroPrefix(string result)
         {
             int count = 0;
-            for (int i = 0; i < str.Length; i++)
+            for (int index = 0; index < result.Length; index++)
             {
-                if (str[i] == '0')
+                if (result[index] == '0')
                     count++;
                 else break;
             }
             return count;
         }
 
-        public bool computeCRC(string message)
+        public static bool ComputeCRC(string polynomial)
         {
-            int pos = divaider.Length;
-            string helpMessage = message.Substring(0, divaider.Length);
-            while (pos <= message.Length)
-                helpMessage = xor(message, divaider, ref pos, helpMessage);
-          //  Console.WriteLine(helpMessage);
-            if (helpMessage.Contains('1'))
-                return false;
-            else 
+            int position = _divider.Length;
+            string polynomialPart = polynomial.Substring(0, _divider.Length);
+            while (!IsDividingEnded(position, polynomial.Length))
+                polynomialPart = Xor(polynomial, ref position, polynomialPart);
+            if (IsResultCorrect(polynomialPart))
                 return true;
+            else
+                return false;
+        }
+
+        private static bool IsDividingEnded(int position, int polynomialLength)
+        {
+            return position > polynomialLength;
+        }
+
+        private static bool IsResultCorrect(string result)
+        {
+            return !result.Contains('1');
         }
     }
 }
