@@ -1,9 +1,13 @@
-﻿using SOnB.Model;
+﻿using SOnB.Business;
+using SOnB.Model;
+using SOnBServer;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,14 +26,70 @@ namespace SOnB
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Thread communicationThread;
+        private CRCMessageLogic crcMessageLogic;
+        private Server server;
+        String port;
         ObservableCollection<ClientThreadModelInfo> threadModelInfos;
         public MainWindow()
         {
             InitializeComponent();
+            this.port = "";
+            this.communicationThread = new Thread(StartServer);
+            this.communicationThread.IsBackground = true;
+            this.communicationThread.Start();
+            SendButton.Visibility = Visibility.Hidden;
+            DataToCRC.Text = "";
+            MessageBox.Text = "";
             this.threadModelInfos = new ObservableCollection<ClientThreadModelInfo>();
             this.threadModelInfos.Add(new ClientThreadModelInfo("1"));
 
             ClientThreadListView.ItemsSource = this.threadModelInfos;
+        }
+
+        private void StartServer()
+        {
+            this.server = new Server(new string[] {"8000" });
+            this.Dispatcher.Invoke(() =>
+            {
+                ServerPortLabel.Content += " " + server.GetPort();
+            });
+            server.Start();
+
+
+
+        }
+        private void DataToCRC_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            this.crcMessageLogic = new CRCMessageLogic(DataToCRC.Text);
+            
+            if (this.crcMessageLogic.getDividerLength() < DataToCRC.Text.Length) {
+                
+                if (Regex.IsMatch(DataToCRC.Text, @"^[0-1]+$"))
+                {
+                    ErrorInfoDataToCRC.Text = "";
+                    MessageBox.Text = this.crcMessageLogic.getMessage();
+                    SendButton.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    MessageBox.Text = "";
+                    ErrorInfoDataToCRC.Text = "Dane powinny zawierać tylko znaki 0 i 1";
+                    SendButton.Visibility = Visibility.Hidden;
+                }
+            }
+            else
+            {
+                MessageBox.Text = "";
+                ErrorInfoDataToCRC.Text = "Długość musi być dłuższa niż 16 znaków";
+                SendButton.Visibility = Visibility.Hidden;
+            }
+           
+        }
+
+        private void SendButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.server.sendMessageToAllClients(MessageBox.Text);
         }
     }
 }

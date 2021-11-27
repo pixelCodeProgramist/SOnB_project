@@ -8,13 +8,11 @@ namespace SOnB.Model
 {
     public class ClientThreadModelInfo
     {
-        private String _clientThreadId;
-        private Boolean _isBitChangeError;
-        private Boolean _isConnectionError;
-
         public ClientThreadModelInfo(string clientThreadId)
         {
             ClientThreadId = clientThreadId;
+            IsBitChangeError = false;
+            IsConnectionError = false;
         }
 
         public String ClientThreadId

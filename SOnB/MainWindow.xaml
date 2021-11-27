@@ -7,15 +7,16 @@
         mc:Ignorable="d"
         Title="CRC server" Height="450" Width="800">
     <Grid>
-        <Label Content="Dzielnik: " HorizontalAlignment="Left" Margin="308,51,0,0" VerticalAlignment="Top"/>
-        <TextBox Name="DividerBox" HorizontalAlignment="Left" Height="23" Margin="368,51,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <Label Content="Wiadomość: " HorizontalAlignment="Left" Margin="84,51,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="MessageBox" HorizontalAlignment="Left" Height="23" Margin="165,51,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
-        <Button Content="Wyślij" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="511,53,0,0"/>
+        <Label Content="Wiadomość: " HorizontalAlignment="Left" Margin="88,87,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="MessageBox" HorizontalAlignment="Left" Height="23" Margin="177,90,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="318"/>
+        <TextBlock x:Name="ErrorInfoDataToCRC" HorizontalAlignment="Left" TextAlignment="Left" Margin="179,73,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="317" Foreground="#FFE41818" Height="16"/>
+        <Label Content="Dane:" HorizontalAlignment="Left" Margin="87,48,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.286,0.262"/>
+        <TextBox Name="DataToCRC" HorizontalAlignment="Left" Height="23" Margin="176,48,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="320" TextChanged="DataToCRC_TextChanged"/>
+        <Button Name="SendButton" Content="Wyślij" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="511,53,0,0" Click="SendButton_Click"/>
         <Label Name="ServerPortLabel" Content="Port serwera:" HorizontalAlignment="Left" Margin="84,15,0,0" VerticalAlignment="Top"/>
-        <Label Content="Logi:" HorizontalAlignment="Left" Margin="86,231,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.297,0.148"/>
+        <Label Content="Logi:" HorizontalAlignment="Left" Margin="91,244,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.297,0.148"/>
         <TextBox Name="LogTextBox" HorizontalAlignment="Left" Height="89" Margin="91,270,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" IsReadOnly="True" Width="585"/>
-        <ListView x:Name="ClientThreadListView" HorizontalAlignment="Left" Height="112" Margin="88,100,0,0" VerticalAlignment="Top" Width="400" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto" Focusable="False" >
+        <ListView x:Name="ClientThreadListView" HorizontalAlignment="Left" Height="112" Margin="92,130,0,0" VerticalAlignment="Top" Width="491" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto" Focusable="False" RenderTransformOrigin="0.5,0.5" >
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="IsHitTestVisible" Value="false"/>

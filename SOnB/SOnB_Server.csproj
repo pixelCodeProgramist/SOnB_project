@@ -55,6 +55,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ServerNet\Communication.cs" />
+    <Compile Include="ServerNet\Server.cs" />
+    <Compile Include="SharedData\CommunicationMessages.cs" />
+    <Compile Include="SharedData\MessageType.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -63,9 +67,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Communication\ICommunication.cs" />
-    <Compile Include="Connection\ResponseMessage.cs" />
-    <Compile Include="Connection\TcpConnection.cs" />
+    <Compile Include="Business\CRCMessageLogic.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

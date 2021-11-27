@@ -4,12 +4,12 @@ namespace test
 {
     class Program
     {
-        static string message = "11001101";
-        static string divider = "100101";
+        static string message = "110100101010010101";
+        static string divider = "11000000000000101";
 
         static void Main(string[] args)
         {
-            message += "00000";
+            message += "0000000000000000";
             computeCRC();
         }
 
@@ -24,7 +24,15 @@ namespace test
             
             int zerosNumber = countZeroPrefix(tempOutput);
             tempOutput = tempOutput.Substring(zerosNumber, tempOutput.Length-zerosNumber);
-            if(pos!=message.Length) tempOutput += message.Substring(pos, zerosNumber);
+            if (pos != message.Length)
+            {
+                if((pos+zerosNumber) <= message.Length)
+                    tempOutput += message.Substring(pos, zerosNumber);
+                else
+                {
+                    tempOutput += message.Substring(pos, message.Length-pos);
+                }
+            }
             pos += zerosNumber;
             Console.WriteLine(tempOutput);
             return tempOutput;
