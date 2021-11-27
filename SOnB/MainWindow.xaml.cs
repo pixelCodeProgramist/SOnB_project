@@ -42,9 +42,22 @@ namespace SOnB
             DataToCRC.Text = "";
             MessageBox.Text = "";
             this.threadModelInfos = new ObservableCollection<ClientThreadModelInfo>();
-            this.threadModelInfos.Add(new ClientThreadModelInfo("1"));
+        }
 
-            ClientThreadListView.ItemsSource = this.threadModelInfos;
+        public void UpdateListOfSockets(ClientThreadModelInfo client)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                ClientThreadListView.Items.Add(client);
+            });
+        }
+
+        public void UpdateLogs(String message)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                LogTextBox.Text += message + "\n";
+            });
         }
 
         private void StartServer()
@@ -54,16 +67,13 @@ namespace SOnB
             {
                 ServerPortLabel.Content += " " + server.GetPort();
             });
-            server.Start();
-
-
-
+            server.Start(this);
         }
         private void DataToCRC_TextChanged(object sender, TextChangedEventArgs e)
         {
             this.crcMessageLogic = new CRCMessageLogic(DataToCRC.Text);
             
-            if (this.crcMessageLogic.getDividerLength() < DataToCRC.Text.Length) {
+            if (3 < DataToCRC.Text.Length) {
                 
                 if (Regex.IsMatch(DataToCRC.Text, @"^[0-1]+$"))
                 {
@@ -81,7 +91,7 @@ namespace SOnB
             else
             {
                 MessageBox.Text = "";
-                ErrorInfoDataToCRC.Text = "Długość musi być dłuższa niż 16 znaków";
+                ErrorInfoDataToCRC.Text = "Długość musi być dłuższa niż 3 znaków";
                 SendButton.Visibility = Visibility.Hidden;
             }
            
@@ -90,6 +100,7 @@ namespace SOnB
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             this.server.sendMessageToAllClients(MessageBox.Text);
+            
         }
     }
 }

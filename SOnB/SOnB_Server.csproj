@@ -55,7 +55,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ServerNet\Communication.cs" />
     <Compile Include="ServerNet\Server.cs" />
     <Compile Include="SharedData\CommunicationMessages.cs" />
     <Compile Include="SharedData\MessageType.cs" />
