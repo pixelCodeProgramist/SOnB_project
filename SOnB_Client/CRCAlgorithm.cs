@@ -1,17 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace test
+namespace SOnB.Client
 {
-    class Program
+   public class CRCAlgorithm
     {
-        static string message = "110100101010010101";
-        static string divider = "11000000000000101";
-
-        static void Main(string[] args)
-        {
-            message += "0000000000000000";
-            computeCRC();
-        }
+        private static readonly string _divider = "11000000000000101";
 
         private static string Xor(string message, ref int position, string input)
         {
@@ -21,21 +18,15 @@ namespace test
                 if (IsBitsEqual(_divider[i], input[i])) output += "0";
                 else output += "1";
             }
-            
-            int zerosNumber = countZeroPrefix(tempOutput);
-            tempOutput = tempOutput.Substring(zerosNumber, tempOutput.Length-zerosNumber);
-            if (pos != message.Length)
-            {
-                if((pos+zerosNumber) <= message.Length)
-                    tempOutput += message.Substring(pos, zerosNumber);
-                else
-                {
-                    tempOutput += message.Substring(pos, message.Length-pos);
-                }
-            }
-            pos += zerosNumber;
-            Console.WriteLine(tempOutput);
-            return tempOutput;
+
+            int zerosNumber = CountZeroPrefix(output);
+            output = output.Substring(zerosNumber);
+            if (!IsDividingEnded(position + zerosNumber, message.Length))
+                output += message.Substring(position, zerosNumber);
+            else
+                output += message.Substring(position, message.Length - position);
+            position += zerosNumber;
+            return output;
         }
 
         private static bool IsBitsEqual(char firstBit, char secondBit)
@@ -61,7 +52,6 @@ namespace test
             string polynomialPart = polynomial.Substring(0, _divider.Length);
             while (!IsDividingEnded(position, polynomial.Length))
                 polynomialPart = Xor(polynomial, ref position, polynomialPart);
-            //  Console.WriteLine(helpMessage);
             if (IsResultCorrect(polynomialPart))
                 return true;
             else
@@ -77,6 +67,5 @@ namespace test
         {
             return !result.Contains('1');
         }
-
     }
 }
