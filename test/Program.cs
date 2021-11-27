@@ -4,29 +4,31 @@ namespace test
 {
     class Program
     {
-        static string message = "11001101";
+        static string message = "11011101";
         static string divider = "100101";
 
         static void Main(string[] args)
         {
-            message += "00000";
+            message += "10101";
             computeCRC();
         }
 
-        static string xor(string message, string divider,ref int pos, string output)
+        static string xor(string message, string divider, ref int pos, string output)
         {
             string tempOutput = "";
-            for(int i = 0; i < divider.Length; i++)
+            for (int i = 0; i < divider.Length; i++)
             {
                 if (divider[i] == output[i]) tempOutput += "0";
                 else tempOutput += "1";
             }
+         
+                int zerosNumber = countZeroPrefix(tempOutput);
+            if (output != divider)
+                tempOutput = tempOutput.Substring(zerosNumber, tempOutput.Length - zerosNumber);
+                if (pos != message.Length) tempOutput += message.Substring(pos, zerosNumber);
+                pos += zerosNumber;
             
-            int zerosNumber = countZeroPrefix(tempOutput);
-            tempOutput = tempOutput.Substring(zerosNumber, tempOutput.Length-zerosNumber);
-            if(pos!=message.Length) tempOutput += message.Substring(pos, zerosNumber);
-            pos += zerosNumber;
-            Console.WriteLine(tempOutput);
+           // Console.WriteLine(tempOutput);
             return tempOutput;
         }
 
@@ -48,6 +50,7 @@ namespace test
             string helpMessage = message.Substring(0, divider.Length);
             while (pos <= message.Length)
                helpMessage = xor(message, divider, ref pos, helpMessage);
+            Console.WriteLine(helpMessage);
 
         }
     }
