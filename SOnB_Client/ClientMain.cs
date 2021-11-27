@@ -15,6 +15,7 @@ namespace SOnB.Client
                 {
                     IsBackground = true
                 };
+                Thread.Sleep(200);
                 threads[counter].Start();
             }
             Thread.CurrentThread.Join();

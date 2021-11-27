@@ -17,6 +17,7 @@ namespace SOnB.Client
             if (tcpConnection.Connect()){
                 Console.WriteLine("Connection");
                 responseMessage = tcpConnection.ReceiveMessage();
+                Console.WriteLine(responseMessage.Message);
                 if (CRCAlgorithm.ComputeCRC(responseMessage.Message))
                     tcpConnection.Send("CRC Passed");
                 else
