@@ -5,8 +5,42 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SOnB"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="CRC server" Height="450" Width="800">
     <Grid>
-        
+        <Label Content="Dzielnik: " HorizontalAlignment="Left" Margin="308,51,0,0" VerticalAlignment="Top"/>
+        <TextBox Name="DividerBox" HorizontalAlignment="Left" Height="23" Margin="368,51,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Wiadomość: " HorizontalAlignment="Left" Margin="84,51,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="MessageBox" HorizontalAlignment="Left" Height="23" Margin="165,51,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="120"/>
+        <Button Content="Wyślij" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="511,53,0,0"/>
+        <Label Name="ServerPortLabel" Content="Port serwera:" HorizontalAlignment="Left" Margin="84,15,0,0" VerticalAlignment="Top"/>
+        <Label Content="Logi:" HorizontalAlignment="Left" Margin="86,231,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.297,0.148"/>
+        <TextBox Name="LogTextBox" HorizontalAlignment="Left" Height="89" Margin="91,270,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" IsReadOnly="True" Width="585"/>
+        <ListView x:Name="ClientThreadListView" HorizontalAlignment="Left" Height="112" Margin="88,100,0,0" VerticalAlignment="Top" Width="400" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto" Focusable="False" >
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="IsHitTestVisible" Value="false"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="ID wątku" Width="60"  DisplayMemberBinding="{Binding ClientThreadId}" />
+                    <GridViewColumn Header="Zmiana bitu/ów wiadomości" Width="160" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <RadioButton Content="{Binding IsBitChangeError}" GroupName="DisplayPage" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Błąd w połączeniu" Width="110">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <RadioButton Content="{Binding IsConnectionError}" GroupName="DisplayPage"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
     </Grid>
 </Window>

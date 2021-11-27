@@ -1,5 +1,7 @@
-﻿using System;
+﻿using SOnB.Model;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,9 +22,14 @@ namespace SOnB
     /// </summary>
     public partial class MainWindow : Window
     {
+        ObservableCollection<ClientThreadModelInfo> threadModelInfos;
         public MainWindow()
         {
             InitializeComponent();
+            this.threadModelInfos = new ObservableCollection<ClientThreadModelInfo>();
+            this.threadModelInfos.Add(new ClientThreadModelInfo("1"));
+
+            ClientThreadListView.ItemsSource = this.threadModelInfos;
         }
     }
 }
