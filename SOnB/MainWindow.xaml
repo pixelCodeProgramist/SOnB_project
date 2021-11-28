@@ -17,27 +17,24 @@
         <Label Content="Logi:" HorizontalAlignment="Left" Margin="91,244,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.297,0.148"/>
         <TextBox Name="LogTextBox" HorizontalAlignment="Left" Height="89" Margin="91,270,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" IsReadOnly="True" Width="585" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+
         <ListView x:Name="ClientThreadListView" HorizontalAlignment="Left" Height="112" Margin="92,130,0,0" VerticalAlignment="Top" Width="491" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto" Focusable="False" RenderTransformOrigin="0.5,0.5" >
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="IsHitTestVisible" Value="false"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Socket" Width="60"  DisplayMemberBinding="{Binding SocketId}" />
+                    
                     <GridViewColumn Header="Zmiana bitu/ów wiadomości" Width="160">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <RadioButton Content="{Binding IsBitChangeError}" GroupName="DisplayPage" />
-                            </DataTemplate>
+                                <CheckBox IsChecked="{Binding IsBitChangeError}"/>
+                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    
                     <GridViewColumn Header="Błąd w połączeniu" Width="110">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <RadioButton Content="{Binding IsConnectionError}" GroupName="DisplayPage"/>
+                                <CheckBox IsChecked="{Binding IsConnectionError}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

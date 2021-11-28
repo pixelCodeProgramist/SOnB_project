@@ -1,4 +1,5 @@
 ﻿using SOnB;
+using SOnB.Business.MessageBitDestroyerFolder;
 using SOnB.Model;
 using System;
 using System.Collections.Generic;
@@ -93,12 +94,24 @@ namespace SOnBServer
             client.Send(bytes, bytes.Length, 0);
         }
 
-        public void sendMessageToAllClients(string message)
+        public void sendMessageToAllClients(string message, ObservableCollection<ClientThreadModelInfo> threadModelInfos)
         {
             try
             {
                 for (int i = 0; i < clients.Count; i++)
-                    sendMessage(clients[i], message);
+                {
+                    Thread.Sleep(200);
+                    if (clients[i] == threadModelInfos[i].Socket && threadModelInfos[i].IsBitChangeError)
+                    {
+                        MessageBitDestroyer messageBitDestroy = new MessageBitDestroyer(message);
+                        sendMessage(clients[i], messageBitDestroy.destroy());
+                    }
+                    else
+                    {
+                        sendMessage(clients[i], message);
+                    }
+                }
+                    
             }
             catch (Exception ex)
             {

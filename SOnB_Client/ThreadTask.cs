@@ -1,5 +1,6 @@
 ﻿using Connection;
 using System;
+using System.Threading;
 
 namespace SOnB.Client
 {
@@ -16,7 +17,9 @@ namespace SOnB.Client
        public void DoWork() {
             if (tcpConnection.Connect()){
                 Console.WriteLine("Connection");
+              
                 responseMessage = tcpConnection.ReceiveMessage();
+                
                 Console.WriteLine(responseMessage.Message);
                 if (CRCAlgorithm.ComputeCRC(responseMessage.Message))
                     tcpConnection.Send("CRC Passed");

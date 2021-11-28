@@ -8,7 +8,8 @@ namespace SOnB
 {
     class CommunicationMessages
     {
-        public const string START_GAME = "Start game";
+        public const string MESSAGE_CORRECTLY_RECEIVED = "Received";
+        public const string INCORRECT_CRC = "CRC error";
         public const string CLOSE_CONNECTION = "";
     }
 }

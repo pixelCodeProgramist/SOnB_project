@@ -46,6 +46,7 @@ namespace SOnB
 
         public void UpdateListOfSockets(ClientThreadModelInfo client)
         {
+            this.threadModelInfos.Add(client);
             this.Dispatcher.Invoke(() =>
             {
                 ClientThreadListView.Items.Add(client);
@@ -99,8 +100,8 @@ namespace SOnB
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
-            this.server.sendMessageToAllClients(MessageBox.Text);
-            
+            this.server.sendMessageToAllClients(MessageBox.Text, threadModelInfos);
         }
+
     }
 }

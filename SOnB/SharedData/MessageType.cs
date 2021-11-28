@@ -8,6 +8,6 @@ namespace SOnB
 {
     enum MessageType
     {
-        START_GAME, CLOSE_CONNECTION
+        MESSAGE_CORRECTLY_RECEIVED, INCORRECT_CRC, CLOSE_CONNECTION
     }
 }
