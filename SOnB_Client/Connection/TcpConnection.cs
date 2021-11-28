@@ -18,8 +18,7 @@ namespace SOnB.Client
             try
             {
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                IPAddress hostadd = IPAddress.Parse("192.168.0.15");
+                IPAddress hostadd = GetIPAddress();
 
                 int port = 8000;
                 IPEndPoint EPhost = new IPEndPoint(hostadd, port);
