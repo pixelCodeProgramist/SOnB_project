@@ -77,13 +77,13 @@ namespace SOnB.Client
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception: {0}", e);
+                Console.WriteLine("Exception: {0}", e.Message);
             }
             finally
             {
                 if (_tcpLsn != null) _tcpLsn.Stop();
             }
-            return responseMessage;
+            return null;
         }
     }
 }

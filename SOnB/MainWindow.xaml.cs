@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -26,18 +27,20 @@ namespace SOnB
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Thread communicationThread;
-        private CRCMessageLogic crcMessageLogic;
-        private Server server;
+        private readonly Thread _communicationThread;
+        private CRCMessageLogic _crcMessageLogic;
+        private Server _server;
         String port;
-        ObservableCollection<ClientThreadModelInfo> threadModelInfos;
+        readonly ObservableCollection<ClientThreadModelInfo> threadModelInfos;
         public MainWindow()
         {
             InitializeComponent();
             this.port = "";
-            this.communicationThread = new Thread(StartServer);
-            this.communicationThread.IsBackground = true;
-            this.communicationThread.Start();
+            this._communicationThread = new Thread(StartServer)
+            {
+                IsBackground = true
+            };
+            this._communicationThread.Start();
             SendButton.Visibility = Visibility.Hidden;
             DataToCRC.Text = "";
             MessageBox.Text = "";
@@ -53,6 +56,15 @@ namespace SOnB
             });
         }
 
+        public void RemoveSocketFromList(ClientThreadModelInfo client)
+        {
+            this.threadModelInfos.Remove(client);
+            this.Dispatcher.Invoke(() =>
+            {
+                ClientThreadListView.Items.Remove(client);
+            });
+        }
+
         public void UpdateLogs(String message)
         {
             this.Dispatcher.Invoke(() =>
@@ -63,23 +75,23 @@ namespace SOnB
 
         private void StartServer()
         {
-            this.server = new Server(new string[] {"8000" });
+            this._server = new Server(new string[] {"8000" });
             this.Dispatcher.Invoke(() =>
             {
-                ServerPortLabel.Content += " " + server.GetPort();
+                ServerPortLabel.Content += " " + _server.GetPort();
             });
-            server.Start(this);
+            _server.Start(this);
         }
         private void DataToCRC_TextChanged(object sender, TextChangedEventArgs e)
         {
-            this.crcMessageLogic = new CRCMessageLogic(DataToCRC.Text);
+            this._crcMessageLogic = new CRCMessageLogic(DataToCRC.Text);
             
             if (3 < DataToCRC.Text.Length) {
                 
                 if (Regex.IsMatch(DataToCRC.Text, @"^[0-1]+$"))
                 {
                     ErrorInfoDataToCRC.Text = "";
-                    MessageBox.Text = this.crcMessageLogic.getMessage();
+                    MessageBox.Text = this._crcMessageLogic.GetMessage();
                     SendButton.Visibility = Visibility.Visible;
                 }
                 else
@@ -100,8 +112,7 @@ namespace SOnB
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
-            this.server.sendMessageToAllClients(MessageBox.Text, threadModelInfos);
+            this._server.SendMessageToAllClients(MessageBox.Text, threadModelInfos);
         }
-
     }
 }

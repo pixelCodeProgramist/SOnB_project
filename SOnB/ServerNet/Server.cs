@@ -4,35 +4,32 @@ using SOnB.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace SOnBServer
 {
     class Server
     {
-        private const int MAX_MESSAGE_SIZE = 1024 * 1024;
-        private int listnerPort;
-        private int counter = 0;
-        private const int MAX_CLIENTS = 10;
-        List<Socket> clients;
+        private const int _MaxMessageSize = 1024 * 1024;
+        private readonly int _listnerPort;
+        private int _counter = 0;
+        private const int _MaxClients = 10;
+        private MainWindow _mainWindow;
+        private readonly List<ClientThreadModelInfo> _clients;
         
         public Server(string[] args)
         {
-            this.listnerPort = SetPort(args[0]);
-            clients = new List<Socket>();
+            this._listnerPort = SetPort(args[0]);
+            _clients = new List<ClientThreadModelInfo>();
         }
 
         public String GetPort()
         {
-            return listnerPort.ToString();
+            return _listnerPort.ToString();
         }
 
         private int SetPort(string text)
@@ -51,33 +48,58 @@ namespace SOnBServer
 
         public void Start(MainWindow mainWindow)
         {
-            Console.WriteLine("Starting TCP listener...");
-
-            IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, listnerPort);
+            this._mainWindow = mainWindow;
+            IPEndPoint endpoint = new IPEndPoint(IPAddress.Any, _listnerPort);
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             socket.Bind(endpoint);
-            socket.Listen(MAX_CLIENTS);
-            while (clients.Count() < 9)
+            socket.Listen(_MaxClients);
+            while(true)
             {
-                counter++;
-                Socket client = socket.Accept();
-                clients.Add(client);
-                mainWindow.UpdateListOfSockets(new ClientThreadModelInfo(counter.ToString(), client));
+                AddAllClients(socket);
+                TryReciveMessageFromClients();
             }
-            foreach(Socket s in clients)
+        }
+
+        private void AddAllClients(Socket socket)
+        {
+            _counter = 0;
+            while (_clients.Count() < 9)
             {
-                byte[] message = new byte[MAX_MESSAGE_SIZE];
+                _counter++;
+                Socket client = socket.Accept();
+                ClientThreadModelInfo clientInfo = new ClientThreadModelInfo(_counter.ToString(), client);
+                _clients.Add(clientInfo);
+                _mainWindow.UpdateListOfSockets(clientInfo);
+            }
+        }
+
+        private void TryReciveMessageFromClients()
+        {
+            while (_clients.Count() > 0)
+            {
                 try
                 {
-                    int length = s.Receive(message);
-                    String messageStr = Encoding.UTF8.GetString(message, 0, length);
-                    mainWindow.UpdateLogs(messageStr);
-                }
-                catch (SocketException ex)
-                {
-                    HandleException(ex,s);
-                    
-                    break;
+                    foreach (ClientThreadModelInfo client in _clients)
+                    {
+                        byte[] message = new byte[_MaxMessageSize];
+                        try
+                        {
+                            int length = client.Socket.Receive(message);
+                            String messageStr = Encoding.UTF8.GetString(message, 0, length);
+                            _mainWindow.UpdateLogs(messageStr);
+                        }
+                        catch (SocketException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            HandleException(client);
+                            continue;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            continue;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -86,29 +108,27 @@ namespace SOnBServer
             }
         }
 
-  
-
-        public void sendMessage(Socket client, string message)
+        public void SendMessage(Socket client, string message)
         {
             Byte[] bytes = Encoding.UTF8.GetBytes(message);
             client.Send(bytes, bytes.Length, 0);
         }
 
-        public void sendMessageToAllClients(string message, ObservableCollection<ClientThreadModelInfo> threadModelInfos)
+        public void SendMessageToAllClients(string message, ObservableCollection<ClientThreadModelInfo> threadModelInfos)
         {
             try
             {
-                for (int i = 0; i < clients.Count; i++)
+                for (int i = 0; i < _clients.Count; i++)
                 {
-                    Thread.Sleep(200);
-                    if (clients[i] == threadModelInfos[i].Socket && threadModelInfos[i].IsBitChangeError)
+                    Thread.Sleep(50);
+                    if (_clients[i].Socket == threadModelInfos[i].Socket && threadModelInfos[i].IsBitChangeError)
                     {
                         MessageBitDestroyer messageBitDestroy = new MessageBitDestroyer(message);
-                        sendMessage(clients[i], messageBitDestroy.destroy());
+                        SendMessage(_clients[i].Socket, messageBitDestroy.destroy());
                     }
                     else
                     {
-                        sendMessage(clients[i], message);
+                        SendMessage(_clients[i].Socket, message);
                     }
                 }
                     
@@ -119,11 +139,10 @@ namespace SOnBServer
             }
         }
 
-        private void HandleException(Exception ex, Socket s)
+        private void HandleException(ClientThreadModelInfo client)
         {
-            clients.Remove(s);
-            
+            _clients.Remove(client);
+            _mainWindow.RemoveSocketFromList(client);
         }
-
     }
 }

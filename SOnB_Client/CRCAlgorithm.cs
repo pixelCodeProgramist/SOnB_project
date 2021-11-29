@@ -46,7 +46,7 @@ namespace SOnB.Client
             return count;
         }
 
-        public static bool ComputeCRC(string polynomial)
+        public static bool IsCrcCorect(string polynomial)
         {
             int position = _divider.Length;
             string polynomialPart = polynomial.Substring(0, _divider.Length);

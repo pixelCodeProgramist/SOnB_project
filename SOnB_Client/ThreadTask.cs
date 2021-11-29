@@ -6,8 +6,8 @@ namespace SOnB.Client
 {
     public  class ThreadTask
     {
-        TcpConnection tcpConnection;
-        ResponseMessage responseMessage;
+        private TcpConnection tcpConnection;
+        private ResponseMessage responseMessage;
 
        public ThreadTask() {
             tcpConnection = new TcpConnection();
@@ -17,14 +17,18 @@ namespace SOnB.Client
        public void DoWork() {
             if (tcpConnection.Connect()){
                 Console.WriteLine("Connection");
-              
-                responseMessage = tcpConnection.ReceiveMessage();
-                
-                Console.WriteLine(responseMessage.Message);
-                if (CRCAlgorithm.ComputeCRC(responseMessage.Message))
-                    tcpConnection.Send("CRC Passed");
-                else
-                    tcpConnection.Send("CRC Error");
+
+                while (true) 
+                {
+                    if ((responseMessage = tcpConnection.ReceiveMessage()) == null)
+                        break;
+
+                    Console.WriteLine(responseMessage.Message);
+                    if (CRCAlgorithm.IsCrcCorect(responseMessage.Message))
+                        tcpConnection.Send(Thread.CurrentThread.Name + ": CRC Passed");
+                    else
+                        tcpConnection.Send(Thread.CurrentThread.Name + ": CRC Error");
+                }               
             }
             else
                 Console.WriteLine("Connection error");

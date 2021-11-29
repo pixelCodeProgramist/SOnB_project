@@ -11,11 +11,12 @@ namespace SOnB.Client
             Thread[] threads = new Thread[9];
             for (int counter = 0; counter < 9; counter++)
             {
+                Thread.Sleep(100);
                 threads[counter] = new Thread(() => new ThreadTask().DoWork())
                 {
-                    IsBackground = true
+                    IsBackground = true,
+                    Name = "Thread " + (counter + 1)
                 };
-                Thread.Sleep(200);
                 threads[counter].Start();
             }
             Thread.CurrentThread.Join();
