@@ -2,8 +2,8 @@
 {
     class CommunicationMessages
     {
-        public const string MessageCorrectlyReceived = "Received";
-        public const string IncorrectCRC = "CRC error";
+        public const string CorrectCRC = "CRC Passed";
+        public const string IncorrectCRC = "CRC Error";
         public const string CloseConnection = "";
     }
 }

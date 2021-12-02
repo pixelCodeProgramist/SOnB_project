@@ -110,9 +110,24 @@ namespace SOnB
            
         }
 
+        public String GetDataFromTextBox()
+        {
+            String data = "";
+            this.Dispatcher.Invoke(() => 
+            {
+                data = this.DataToCRC.Text;
+            });
+            return data;
+        }
+
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             this._server.SendMessageToAllClients(MessageBox.Text, threadModelInfos);
+        }
+
+        private void ClearLogs_Click(object sender, RoutedEventArgs e)
+        {
+            LogTextBox.Text = "";
         }
     }
 }
