@@ -2,22 +2,11 @@
 using SOnB.Model;
 using SOnBServer;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SOnB
 {
@@ -26,18 +15,20 @@ namespace SOnB
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Thread communicationThread;
-        private CRCMessageLogic crcMessageLogic;
-        private Server server;
+        private readonly Thread _communicationThread;
+        private CRCMessageLogic _crcMessageLogic;
+        private Server _server;
         String port;
-        ObservableCollection<ClientThreadModelInfo> threadModelInfos;
+        private ObservableCollection<ClientThreadModelInfo> threadModelInfos;
         public MainWindow()
         {
             InitializeComponent();
             this.port = "";
-            this.communicationThread = new Thread(StartServer);
-            this.communicationThread.IsBackground = true;
-            this.communicationThread.Start();
+            this._communicationThread = new Thread(StartServer)
+            {
+                IsBackground = true
+            };
+            this._communicationThread.Start();
             SendButton.Visibility = Visibility.Hidden;
             DataToCRC.Text = "";
             MessageBox.Text = "";
@@ -46,9 +37,21 @@ namespace SOnB
 
         public void UpdateListOfSockets(ClientThreadModelInfo client)
         {
+            
+            this.threadModelInfos.Add(client);
             this.Dispatcher.Invoke(() =>
             {
                 ClientThreadListView.Items.Add(client);
+                
+            });
+        }
+
+        public void RemoveSocketFromList(ClientThreadModelInfo client)
+        {
+            this.threadModelInfos.Remove(client);
+            this.Dispatcher.Invoke(() =>
+            {
+                ClientThreadListView.Items.Remove(client);
             });
         }
 
@@ -62,23 +65,23 @@ namespace SOnB
 
         private void StartServer()
         {
-            this.server = new Server(new string[] {"8000" });
+            this._server = new Server(new string[] {"8000" });
             this.Dispatcher.Invoke(() =>
             {
-                ServerPortLabel.Content += " " + server.GetPort();
+                ServerPortLabel.Content += " " + _server.GetPort();
             });
-            server.Start(this);
+            _server.Start(this);
         }
         private void DataToCRC_TextChanged(object sender, TextChangedEventArgs e)
         {
-            this.crcMessageLogic = new CRCMessageLogic(DataToCRC.Text);
+            this._crcMessageLogic = new CRCMessageLogic(DataToCRC.Text);
             
             if (3 < DataToCRC.Text.Length) {
                 
                 if (Regex.IsMatch(DataToCRC.Text, @"^[0-1]+$"))
                 {
                     ErrorInfoDataToCRC.Text = "";
-                    MessageBox.Text = this.crcMessageLogic.getMessage();
+                    MessageBox.Text = this._crcMessageLogic.GetMessage();
                     SendButton.Visibility = Visibility.Visible;
                 }
                 else
@@ -99,8 +102,38 @@ namespace SOnB
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
-            this.server.sendMessageToAllClients(MessageBox.Text);
-            
+            this._server.SendMessageToAllClients(MessageBox.Text, threadModelInfos);
+        }
+
+        private void LogTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            LogTextBox.Focus();
+            LogTextBox.CaretIndex = LogTextBox.Text.Length;
+            LogTextBox.ScrollToEnd();
+        }
+
+        private void CheckBoxChanged(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            ClientThreadModelInfo client = checkBox.DataContext as ClientThreadModelInfo;
+            if(checkBox.Name == "BitChangeCheckBox")
+            {
+                client.IsConnectionError = false;
+                client.IsRepeatAnswearError = false;
+            }
+
+            if (checkBox.Name == "ConnectionErrorCheckBox")
+            {
+                client.IsBitChangeError = false;
+                client.IsRepeatAnswearError = false;
+            }
+
+            if (checkBox.Name == "RepeatAnswearCheckBox")
+            {
+                client.IsBitChangeError = false;
+                client.IsConnectionError = false;
+            }
+            ClientThreadListView.Items.Refresh();
         }
     }
 }

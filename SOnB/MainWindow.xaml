@@ -16,28 +16,33 @@
         <Label Name="ServerPortLabel" Content="Port serwera:" HorizontalAlignment="Left" Margin="84,15,0,0" VerticalAlignment="Top"/>
         <Label Content="Logi:" HorizontalAlignment="Left" Margin="91,244,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.297,0.148"/>
         <TextBox Name="LogTextBox" HorizontalAlignment="Left" Height="89" Margin="91,270,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" IsReadOnly="True" Width="585" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto"/>
-        <ListView x:Name="ClientThreadListView" HorizontalAlignment="Left" Height="112" Margin="92,130,0,0" VerticalAlignment="Top" Width="491" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto" Focusable="False" RenderTransformOrigin="0.5,0.5" >
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="IsHitTestVisible" Value="false"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListView.ItemContainerStyle>
+                 ScrollViewer.VerticalScrollBarVisibility="Auto" TextChanged="LogTextBox_TextChanged"/>
+
+        <ListView x:Name="ClientThreadListView" HorizontalAlignment="Left" Height="112" Margin="92,130,0,0" VerticalAlignment="Top" Width="540" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto" Focusable="False" RenderTransformOrigin="0.5,0.5">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Socket" Width="60"  DisplayMemberBinding="{Binding SocketId}" />
+                    
                     <GridViewColumn Header="Zmiana bitu/ów wiadomości" Width="160">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <RadioButton Content="{Binding IsBitChangeError}" GroupName="DisplayPage" />
-                            </DataTemplate>
+                                <CheckBox  Name="BitChangeCheckBox" IsChecked="{Binding IsBitChangeError}" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
+                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    
                     <GridViewColumn Header="Błąd w połączeniu" Width="110">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <RadioButton Content="{Binding IsConnectionError}" GroupName="DisplayPage"/>
+                                <CheckBox Name="ConnectionErrorCheckBox" IsChecked="{Binding IsConnectionError}" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Przesyłanie tej samej odpowiedzi" Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox Name="RepeatAnswearCheckBox" IsChecked="{Binding IsRepeatAnswearError}" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

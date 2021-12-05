@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Business\MessageBitDestroyerFolder\MessageBitDestroyer.cs" />
     <Compile Include="ServerNet\Server.cs" />
     <Compile Include="SharedData\CommunicationMessages.cs" />
     <Compile Include="SharedData\MessageType.cs" />

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOnB.Business
 {
@@ -14,16 +10,16 @@ namespace SOnB.Business
         public CRCMessageLogic(string data)
         {
             this.data = data;
-            fillZero();
+            FillZero();
         }
 
-        private void fillZero()
+        private void FillZero()
         {
             for (int i = 0; i < divider.Length-1; i++)
                 this.data += "0";
         }
 
-        private string xor(string message, string divider, ref int pos, string output)
+        private string Xor(string message, string divider, ref int pos, string output)
         {
             string tempOutput = "";
             for (int i = 0; i < divider.Length; i++)
@@ -32,7 +28,7 @@ namespace SOnB.Business
                 else tempOutput += "1";
             }
 
-            int zerosNumber = countZeroPrefix(tempOutput);
+            int zerosNumber = CountZeroPrefix(tempOutput);
             tempOutput = tempOutput.Substring(zerosNumber, tempOutput.Length - zerosNumber);
             if (pos != message.Length)
             {
@@ -47,7 +43,7 @@ namespace SOnB.Business
             return tempOutput;
         }
 
-        private int countZeroPrefix(string str)
+        private int CountZeroPrefix(string str)
         {
             int count = 0;
             for (int i = 0; i < str.Length; i++)
@@ -59,31 +55,27 @@ namespace SOnB.Business
             return count;
         }
 
-        public String computeCRC()
+        public String ComputeCRC()
         {
             int pos = divider.Length;
             string helpMessage = this.data.Substring(0, divider.Length);
             while (pos <= this.data.Length)
-                helpMessage = xor(this.data, divider, ref pos, helpMessage);
+                helpMessage = Xor(this.data, divider, ref pos, helpMessage);
             return helpMessage;
         }
 
-        public String getMessage()
+        public String GetMessage()
         {
-            String crc = computeCRC();
+            String crc = ComputeCRC();
             String dataToModify = new String(data.ToCharArray());
             dataToModify = dataToModify.Substring(0,dataToModify.Length-crc.Length);
             dataToModify += crc;
             return dataToModify;
         }
 
-        public int getDividerLength()
+        public int GetDividerLength()
         {
             return divider.Length;
         }
-
-       
-
-
     }
 }

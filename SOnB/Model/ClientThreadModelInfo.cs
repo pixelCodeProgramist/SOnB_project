@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace SOnB.Model
 {
@@ -15,6 +13,7 @@ namespace SOnB.Model
             Socket = socket;
             IsBitChangeError = false;
             IsConnectionError = false;
+            IsRepeatAnswearError = false;
         }
 
         public Socket Socket
@@ -40,5 +39,23 @@ namespace SOnB.Model
             set;
         }
 
+        public Boolean IsRepeatAnswearError
+        {
+            get;
+            set;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is ClientThreadModelInfo info &&
+                   SocketId == info.SocketId;
+        }
+
+        
+
+        public override int GetHashCode()
+        {
+            return 37337545 + EqualityComparer<string>.Default.GetHashCode(SocketId);
+        }
     }
 }
