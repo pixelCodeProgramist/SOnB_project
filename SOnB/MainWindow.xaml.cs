@@ -19,7 +19,7 @@ namespace SOnB
         private CRCMessageLogic _crcMessageLogic;
         private Server _server;
         String port;
-        private ObservableCollection<ClientThreadModelInfo> threadModelInfos;
+        readonly ObservableCollection<ClientThreadModelInfo> threadModelInfos;
         public MainWindow()
         {
             InitializeComponent();
@@ -37,7 +37,6 @@ namespace SOnB
 
         public void UpdateListOfSockets(ClientThreadModelInfo client)
         {
-            
             this.threadModelInfos.Add(client);
             this.Dispatcher.Invoke(() =>
             {
@@ -100,10 +99,21 @@ namespace SOnB
            
         }
 
+        public String GetDataFromTextBox()
+        {
+            String data = "";
+            this.Dispatcher.Invoke(() => 
+            {
+                data = this.DataToCRC.Text;
+            });
+            return data;
+        }
+
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             this._server.SendMessageToAllClients(MessageBox.Text, threadModelInfos);
         }
+
 
         private void LogTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -116,7 +126,7 @@ namespace SOnB
         {
             CheckBox checkBox = sender as CheckBox;
             ClientThreadModelInfo client = checkBox.DataContext as ClientThreadModelInfo;
-            if(checkBox.Name == "BitChangeCheckBox")
+            if (checkBox.Name == "BitChangeCheckBox")
             {
                 client.IsConnectionError = false;
                 client.IsRepeatAnswearError = false;
@@ -134,6 +144,11 @@ namespace SOnB
                 client.IsConnectionError = false;
             }
             ClientThreadListView.Items.Refresh();
+        }
+        private void ClearLogs_Click(object sender, RoutedEventArgs e)
+        {
+            LogTextBox.Text = "";
+
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SOnB;
+using SOnB.Business;
 using SOnB.Business.MessageBitDestroyerFolder;
 using SOnB.Model;
 using System;
@@ -81,12 +82,16 @@ namespace SOnBServer
                 {
                     foreach (ClientThreadModelInfo client in _clients)
                     {
-                        byte[] message = new byte[_MaxMessageSize];
                         try
                         {
-                            int length = client.Socket.Receive(message);
-                            String messageStr = Encoding.UTF8.GetString(message, 0, length);
+                            String messageStr = ReceiveMessage(client);
                             _mainWindow.UpdateLogs(messageStr);
+                            if (IsMessageContainError(messageStr))
+                            {
+                                SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
+                                messageStr = ReceiveMessage(client);
+                                _mainWindow.UpdateLogs(messageStr);
+                            }
                         }
                         catch (SocketException ex)
                         {
@@ -108,8 +113,28 @@ namespace SOnBServer
             }
         }
 
+        private void DoDataRetransmission(ClientThreadModelInfo client)
+        {
+            SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
+            String messageStr = ReceiveMessage(client);
+            _mainWindow.UpdateLogs(messageStr);
+        }
+
+        private bool IsMessageContainError(String messageStr)
+        {
+            return messageStr.Contains(CommunicationMessages.IncorrectCRC);
+        }
+
+        private String ReceiveMessage(ClientThreadModelInfo client) 
+        {
+            byte[] message = new byte[_MaxMessageSize];
+            int length = client.Socket.Receive(message);
+            return Encoding.UTF8.GetString(message, 0, length);
+        }
+
         public void SendMessage(Socket client, string message)
         {
+            Thread.Sleep(50);
             Byte[] bytes = Encoding.UTF8.GetBytes(message);
             client.Send(bytes, bytes.Length, 0);
         }
@@ -120,7 +145,7 @@ namespace SOnBServer
             {
                 for (int i = 0; i < _clients.Count; i++)
                 {
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                     if (_clients[i].Socket == threadModelInfos[i].Socket && threadModelInfos[i].IsBitChangeError)
                     {
                         MessageBitDestroyer messageBitDestroy = new MessageBitDestroyer(message);
@@ -143,6 +168,7 @@ namespace SOnBServer
                             else SendMessage(_clients[i].Socket, message);
                         }
                        
+                        SendMessage(_clients[i].Socket, message);
                     }
                 }
                     

@@ -18,16 +18,17 @@
         <TextBox Name="LogTextBox" HorizontalAlignment="Left" Height="89" Margin="91,270,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" IsReadOnly="True" Width="585" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ScrollViewer.VerticalScrollBarVisibility="Auto" TextChanged="LogTextBox_TextChanged"/>
 
-        <ListView x:Name="ClientThreadListView" HorizontalAlignment="Left" Height="112" Margin="92,130,0,0" VerticalAlignment="Top" Width="540" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto" Focusable="False" RenderTransformOrigin="0.5,0.5">
-            <ListView.View>
+            <ListView x:Name="ClientThreadListView" HorizontalAlignment="Left" Height="112" Margin="92,130,0,0" VerticalAlignment="Top" Width="540" ScrollViewer.HorizontalScrollBarVisibility="Auto"  ScrollViewer.VerticalScrollBarVisibility="Auto" Focusable="False" RenderTransformOrigin="0.5,0.5">
+                <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Socket" Width="60"  DisplayMemberBinding="{Binding SocketId}" />
                     
                     <GridViewColumn Header="Zmiana bitu/ów wiadomości" Width="160">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
+
                                 <CheckBox  Name="BitChangeCheckBox" IsChecked="{Binding IsBitChangeError}" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
-                             </DataTemplate>
+                            </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     
@@ -49,5 +50,6 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <Button Content="Wyczyść logi" HorizontalAlignment="Left" Margin="601,377,0,0" VerticalAlignment="Top" Width="75" Click="ClearLogs_Click"/>
     </Grid>
 </Window>

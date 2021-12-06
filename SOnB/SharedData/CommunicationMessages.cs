@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SOnB
+﻿namespace SOnB
 {
     class CommunicationMessages
     {
-        public const string START_GAME = "Start game";
-        public const string CLOSE_CONNECTION = "";
+        public const string CorrectCRC = "CRC Passed";
+        public const string IncorrectCRC = "CRC Error";
+        public const string CloseConnection = "";
     }
 }

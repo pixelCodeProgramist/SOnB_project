@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Windows.Controls;
+
 
 namespace SOnB.Model
 {
@@ -50,8 +50,6 @@ namespace SOnB.Model
             return obj is ClientThreadModelInfo info &&
                    SocketId == info.SocketId;
         }
-
-        
 
         public override int GetHashCode()
         {
