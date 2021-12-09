@@ -2,23 +2,11 @@
 using SOnB.Model;
 using SOnBServer;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SOnB
 {
@@ -53,6 +41,7 @@ namespace SOnB
             this.Dispatcher.Invoke(() =>
             {
                 ClientThreadListView.Items.Add(client);
+                
             });
         }
 
@@ -125,9 +114,41 @@ namespace SOnB
             this._server.SendMessageToAllClients(MessageBox.Text, threadModelInfos);
         }
 
+
+        private void LogTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            LogTextBox.Focus();
+            LogTextBox.CaretIndex = LogTextBox.Text.Length;
+            LogTextBox.ScrollToEnd();
+        }
+
+        private void CheckBoxChanged(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            ClientThreadModelInfo client = checkBox.DataContext as ClientThreadModelInfo;
+            if (checkBox.Name == "BitChangeCheckBox")
+            {
+                client.IsConnectionError = false;
+                client.IsRepeatAnswearError = false;
+            }
+
+            if (checkBox.Name == "ConnectionErrorCheckBox")
+            {
+                client.IsBitChangeError = false;
+                client.IsRepeatAnswearError = false;
+            }
+
+            if (checkBox.Name == "RepeatAnswearCheckBox")
+            {
+                client.IsBitChangeError = false;
+                client.IsConnectionError = false;
+            }
+            ClientThreadListView.Items.Refresh();
+        }
         private void ClearLogs_Click(object sender, RoutedEventArgs e)
         {
             LogTextBox.Text = "";
+
         }
     }
 }

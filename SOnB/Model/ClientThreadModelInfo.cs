@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 
+
 namespace SOnB.Model
 {
     public class ClientThreadModelInfo
@@ -12,6 +13,7 @@ namespace SOnB.Model
             Socket = socket;
             IsBitChangeError = false;
             IsConnectionError = false;
+            IsRepeatAnswearError = false;
         }
 
         public Socket Socket
@@ -32,6 +34,12 @@ namespace SOnB.Model
         }
 
         public Boolean IsConnectionError
+        {
+            get;
+            set;
+        }
+
+        public Boolean IsRepeatAnswearError
         {
             get;
             set;

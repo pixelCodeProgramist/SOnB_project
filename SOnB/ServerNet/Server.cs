@@ -82,7 +82,6 @@ namespace SOnBServer
                 {
                     foreach (ClientThreadModelInfo client in _clients)
                     {
-                        
                         try
                         {
                             String messageStr = ReceiveMessage(client);
@@ -154,6 +153,21 @@ namespace SOnBServer
                     }
                     else
                     {
+                        if (threadModelInfos[i].IsRepeatAnswearError)
+                        {
+                            for(int number = 0; number < 10; number++)
+                            {
+                                SendMessage(_clients[i].Socket, message);
+                                Thread.Sleep(50);
+                            }
+                        }
+                        else
+                        {
+                            if(threadModelInfos[i].IsConnectionError)
+                                SendMessage(_clients[i].Socket, "Connection error");
+                            else SendMessage(_clients[i].Socket, message);
+                        }
+                       
                         SendMessage(_clients[i].Socket, message);
                     }
                 }
