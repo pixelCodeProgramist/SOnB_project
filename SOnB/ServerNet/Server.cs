@@ -85,6 +85,7 @@ namespace SOnBServer
                         try
                         {
                             String messageStr = ReceiveMessage(client);
+                            if (messageStr.Trim() == "") HandleException(client);
                             _mainWindow.UpdateLogs(messageStr);
                             if (IsMessageContainError(messageStr))
                             {
