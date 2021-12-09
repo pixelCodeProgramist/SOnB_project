@@ -37,10 +37,7 @@ namespace SOnB
                     MainWindow mainWindow2 = new MainWindow(port2, "Slave server");
                     mainWindow2.Show();
                 }
-
-               
             }
-           
         }
 
         bool checkPort(string port)

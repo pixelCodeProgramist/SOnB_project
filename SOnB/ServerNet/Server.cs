@@ -21,7 +21,8 @@ namespace SOnBServer
         private const int _MaxClients = 10;
         private MainWindow _mainWindow;
         private readonly List<ClientThreadModelInfo> _clients;
-        
+        private Thread _addClientThread;
+
         public Server(string port)
         {
             this._listnerPort = SetPort(port);
@@ -54,9 +55,11 @@ namespace SOnBServer
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             socket.Bind(endpoint);
             socket.Listen(_MaxClients);
-            while(true)
+            this._addClientThread = new Thread(() => this.AddAllClients(socket));
+            this._addClientThread.IsBackground = true;
+            this._addClientThread.Start();
+            while (true)
             {
-                AddAllClients(socket);
                 TryReciveMessageFromClients();
             }
         }
@@ -64,7 +67,7 @@ namespace SOnBServer
         private void AddAllClients(Socket socket)
         {
             _counter = 0;
-            while (_clients.Count() < 9)
+            while (true)
             {
                 _counter++;
                 Socket client = socket.Accept();
@@ -135,7 +138,6 @@ namespace SOnBServer
 
         public void SendMessage(Socket client, string message)
         {
-            Thread.Sleep(50);
             Byte[] bytes = Encoding.UTF8.GetBytes(message);
             client.Send(bytes, bytes.Length, 0);
         }
@@ -147,7 +149,7 @@ namespace SOnBServer
                 for (int i = 0; i < _clients.Count; i++)
                 {
                     Thread.Sleep(100);
-                    if (_clients[i].Socket == threadModelInfos[i].Socket && threadModelInfos[i].IsBitChangeError)
+                    if (threadModelInfos[i].IsBitChangeError)
                     {
                         MessageBitDestroyer messageBitDestroy = new MessageBitDestroyer(message);
                         SendMessage(_clients[i].Socket, messageBitDestroy.destroy());
