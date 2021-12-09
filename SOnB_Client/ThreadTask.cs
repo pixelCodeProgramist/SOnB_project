@@ -14,14 +14,20 @@ namespace SOnB.Client
             responseMessage = new ResponseMessage();
         }
 
-       public void DoWork() {
-            if (tcpConnection.Connect()){
-                Console.WriteLine("Connection");
+       public void DoWork(int port) {
+            if (tcpConnection.Connect(port)){
+                Console.WriteLine("Connected");
 
                 while (true) 
                 {
                     if ((responseMessage = tcpConnection.ReceiveMessage()) == null)
                         break;
+
+                    if (responseMessage.Message.Equals("Connection error")) {
+                        tcpConnection.GetSocket().Disconnect(true);
+                        DoWork(8001);
+                        break;
+                    }
 
                     Console.WriteLine(Thread.CurrentThread.Name + " " + responseMessage.Message);
                     if (CRCAlgorithm.IsCrcCorect(responseMessage.Message))

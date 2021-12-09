@@ -13,14 +13,14 @@ namespace SOnB.Client
         private Socket _socket;
         private ICommunication _iCommunication;
 
-        public Boolean Connect()
+        public Boolean Connect(int port)
         {
             try
             {
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 IPAddress hostadd = GetIPAddress();
 
-                int port = 8000;
+               
                 IPEndPoint EPhost = new IPEndPoint(hostadd, port);
                 _socket.Connect(EPhost);
                 return true;

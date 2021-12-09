@@ -12,7 +12,7 @@ namespace SOnB.Client
             for (int counter = 0; counter < 9; counter++)
             {
                 Thread.Sleep(300);
-                threads[counter] = new Thread(() => new ThreadTask().DoWork())
+                threads[counter] = new Thread(() => new ThreadTask().DoWork(8000))
                 {
                     IsBackground = true,
                     Name = "Thread " + (counter + 1)
