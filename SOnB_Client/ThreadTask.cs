@@ -29,7 +29,7 @@ namespace SOnB.Client
                             DoWork(8001);  
                       }
 
-                    Console.WriteLine(Thread.CurrentThread.Name + " " + responseMessage.Message);
+                    //Console.WriteLine(Thread.CurrentThread.Name + " " + responseMessage.Message);
                     if (CRCAlgorithm.IsCrcCorect(responseMessage.Message))
                         tcpConnection.Send(Thread.CurrentThread.Name + ": CRC Passed");
                     else

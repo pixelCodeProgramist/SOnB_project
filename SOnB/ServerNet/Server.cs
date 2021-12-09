@@ -60,7 +60,10 @@ namespace SOnBServer
             this._addClientThread.Start();
             while (true)
             {
-                TryReciveMessageFromClients();
+                while(_clients.Count() > 8)
+                {
+                    TryReciveMessageFromClients();
+                }
             }
         }
 
@@ -79,17 +82,23 @@ namespace SOnBServer
 
         private void TryReciveMessageFromClients()
         {
-            while (_clients.Count() > 0)
+            while (true)
             {
                 try
                 {
-                    foreach (ClientThreadModelInfo client in _clients)
+                    for (int i=0;i<_clients.Count;i++)
                     {
+                        ClientThreadModelInfo client = _clients[i];
                         try
                         {
                             String messageStr = ReceiveMessage(client);
-                            if (messageStr.Trim() == "") HandleException(client);
-                            _mainWindow.UpdateLogs(messageStr);
+                            if (messageStr.Trim() == "")
+                            {
+                                HandleException(client);
+                                i = 0;
+                                continue;
+                            }
+                            _mainWindow.UpdateLogs("Socket:" +client.SocketId+" " +messageStr);
                             if (IsMessageContainError(messageStr))
                             {
                                 SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
