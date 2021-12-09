@@ -35,7 +35,7 @@
                     <GridViewColumn Header="Błąd w połączeniu" Width="110">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox Name="ConnectionErrorCheckBox" IsChecked="{Binding IsConnectionError}" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
+                                <CheckBox IsEnabled="{Binding CheckBoxEnabled}" Name="ConnectionErrorCheckBox" IsChecked="{Binding IsConnectionError}" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -43,7 +43,7 @@
                     <GridViewColumn Header="Przesyłanie tej samej odpowiedzi" Width="180">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <CheckBox Name="RepeatAnswearCheckBox" IsChecked="{Binding IsRepeatAnswearError}" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
+                                <CheckBox IsEnabled="{Binding CheckBoxEnabled}" Name="RepeatAnswearCheckBox" IsChecked="{Binding IsRepeatAnswearError}" Checked="CheckBoxChanged" Unchecked="CheckBoxChanged"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

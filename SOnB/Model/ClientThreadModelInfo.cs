@@ -45,6 +45,12 @@ namespace SOnB.Model
             set;
         }
 
+        public Boolean CheckBoxEnabled
+        {
+            get;
+            set;
+        }
+        
         public override bool Equals(object obj)
         {
             return obj is ClientThreadModelInfo info &&

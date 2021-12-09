@@ -21,10 +21,12 @@ namespace SOnB
         private int _minClients;
         String port;
         readonly ObservableCollection<ClientThreadModelInfo> threadModelInfos;
+        private bool CheckBoxEnabled;
         
         public MainWindow(string port, string title, int minClients) : this(port)
         {
             this.Title = title;
+            this.CheckBoxEnabled = title == "Slave server" ? false : true;
             this._minClients = minClients;
         }
         public MainWindow(string port)
@@ -44,6 +46,7 @@ namespace SOnB
 
         public void UpdateListOfSockets(ClientThreadModelInfo client)
         {
+            client.CheckBoxEnabled = this.CheckBoxEnabled;
             this.threadModelInfos.Add(client);
             this.Dispatcher.Invoke(() =>
             {
