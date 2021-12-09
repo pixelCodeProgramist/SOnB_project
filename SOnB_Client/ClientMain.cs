@@ -7,6 +7,7 @@ namespace SOnB.Client
     {
         static void Main()
         {
+
             ThreadTask threadTask = new ThreadTask();
             Thread[] threads = new Thread[9];
             for (int counter = 0; counter < 9; counter++)

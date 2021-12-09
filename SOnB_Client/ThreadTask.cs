@@ -1,5 +1,6 @@
 ﻿using Connection;
 using System;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace SOnB.Client
@@ -24,10 +25,9 @@ namespace SOnB.Client
                         break;
 
                     if (responseMessage.Message.Equals("Connection error")) {
-                        tcpConnection.GetSocket().Disconnect(true);
-                        DoWork(8001);
-                        break;
-                    }
+                            tcpConnection.GetSocket().Close();
+                            DoWork(8001);  
+                      }
 
                     Console.WriteLine(Thread.CurrentThread.Name + " " + responseMessage.Message);
                     if (CRCAlgorithm.IsCrcCorect(responseMessage.Message))
