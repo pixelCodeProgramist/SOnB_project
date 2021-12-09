@@ -23,7 +23,7 @@ namespace SOnB.Client
                     if ((responseMessage = tcpConnection.ReceiveMessage()) == null)
                         break;
 
-                    Console.WriteLine(responseMessage.Message);
+                    Console.WriteLine(Thread.CurrentThread.Name + " " + responseMessage.Message);
                     if (CRCAlgorithm.IsCrcCorect(responseMessage.Message))
                         tcpConnection.Send(Thread.CurrentThread.Name + ": CRC Passed");
                     else
