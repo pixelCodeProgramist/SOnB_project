@@ -167,8 +167,6 @@ namespace SOnBServer
                                 SendMessage(_clients[i].Socket, "Connection error");
                             else SendMessage(_clients[i].Socket, message);
                         }
-                       
-                        SendMessage(_clients[i].Socket, message);
                     }
                 }
                     
