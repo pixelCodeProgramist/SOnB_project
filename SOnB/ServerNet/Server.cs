@@ -22,9 +22,9 @@ namespace SOnBServer
         private MainWindow _mainWindow;
         private readonly List<ClientThreadModelInfo> _clients;
         
-        public Server(string[] args)
+        public Server(string port)
         {
-            this._listnerPort = SetPort(args[0]);
+            this._listnerPort = SetPort(port);
             _clients = new List<ClientThreadModelInfo>();
         }
 

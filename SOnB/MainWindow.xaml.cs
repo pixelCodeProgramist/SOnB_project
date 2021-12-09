@@ -20,10 +20,15 @@ namespace SOnB
         private Server _server;
         String port;
         readonly ObservableCollection<ClientThreadModelInfo> threadModelInfos;
-        public MainWindow()
+        
+        public MainWindow(string port, string title) : this(port)
+        {
+            this.Title = title;
+        }
+        public MainWindow(string port)
         {
             InitializeComponent();
-            this.port = "";
+            this.port = port;
             this._communicationThread = new Thread(StartServer)
             {
                 IsBackground = true
@@ -64,13 +69,14 @@ namespace SOnB
 
         private void StartServer()
         {
-            this._server = new Server(new string[] {"8000" });
+            this._server = new Server(this.port);
             this.Dispatcher.Invoke(() =>
             {
                 ServerPortLabel.Content += " " + _server.GetPort();
             });
             _server.Start(this);
         }
+
         private void DataToCRC_TextChanged(object sender, TextChangedEventArgs e)
         {
             this._crcMessageLogic = new CRCMessageLogic(DataToCRC.Text);
