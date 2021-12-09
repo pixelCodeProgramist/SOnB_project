@@ -9,7 +9,6 @@ namespace SOnB.Client
 {
     public class TcpConnection
     {
-        private TcpListener _tcpLsn;
         private Socket _socket;
         private ICommunication _iCommunication;
 
@@ -78,10 +77,6 @@ namespace SOnB.Client
             catch (Exception e)
             {
                 Console.WriteLine("Exception: {0}", e.Message);
-            }
-            finally
-            {
-                if (_tcpLsn != null) _tcpLsn.Stop();
             }
             return null;
         }

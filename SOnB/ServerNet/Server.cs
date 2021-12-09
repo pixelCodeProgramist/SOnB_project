@@ -22,9 +22,11 @@ namespace SOnBServer
         private MainWindow _mainWindow;
         private readonly List<ClientThreadModelInfo> _clients;
         private Thread _addClientThread;
+        private int _minClients;
 
-        public Server(string port)
+        public Server(string port, int maxClients)
         {
+            this._minClients = maxClients;
             this._listnerPort = SetPort(port);
             _clients = new List<ClientThreadModelInfo>();
         }
@@ -60,7 +62,7 @@ namespace SOnBServer
             this._addClientThread.Start();
             while (true)
             {
-                while(_clients.Count() > 8)
+                while (_clients.Count() > _minClients)
                 {
                     TryReciveMessageFromClients();
                 }
@@ -86,7 +88,7 @@ namespace SOnBServer
             {
                 try
                 {
-                    for (int i=0;i<_clients.Count;i++)
+                    for (int i = 0; i < _clients.Count; i++)
                     {
                         ClientThreadModelInfo client = _clients[i];
                         try
@@ -95,10 +97,11 @@ namespace SOnBServer
                             if (messageStr.Trim() == "")
                             {
                                 HandleException(client);
-                                i = 0;
+                                i = -1;
+                                Thread.Sleep(200);
                                 continue;
                             }
-                            _mainWindow.UpdateLogs("Socket:" +client.SocketId+" " +messageStr);
+                            _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
                             if (IsMessageContainError(messageStr))
                             {
                                 SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
@@ -126,19 +129,12 @@ namespace SOnBServer
             }
         }
 
-        private void DoDataRetransmission(ClientThreadModelInfo client)
-        {
-            SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
-            String messageStr = ReceiveMessage(client);
-            _mainWindow.UpdateLogs(messageStr);
-        }
-
         private bool IsMessageContainError(String messageStr)
         {
             return messageStr.Contains(CommunicationMessages.IncorrectCRC);
         }
 
-        private String ReceiveMessage(ClientThreadModelInfo client) 
+        private String ReceiveMessage(ClientThreadModelInfo client)
         {
             byte[] message = new byte[_MaxMessageSize];
             int length = client.Socket.Receive(message);
@@ -158,30 +154,30 @@ namespace SOnBServer
                 for (int i = 0; i < _clients.Count; i++)
                 {
                     Thread.Sleep(100);
-                    if (threadModelInfos[i].IsBitChangeError)
+                    if (_mainWindow.GetBitChangeError(i))
                     {
                         MessageBitDestroyer messageBitDestroy = new MessageBitDestroyer(message);
                         SendMessage(_clients[i].Socket, messageBitDestroy.destroy());
                     }
                     else
                     {
-                        if (threadModelInfos[i].IsRepeatAnswearError)
+                        if (_mainWindow.GetRepeatAnswearError(i))
                         {
-                            for(int number = 0; number < 10; number++)
+                            for (int number = 0; number < 5; number++)
                             {
                                 SendMessage(_clients[i].Socket, message);
-                                Thread.Sleep(50);
+                                Thread.Sleep(200);
                             }
                         }
                         else
                         {
-                            if(threadModelInfos[i].IsConnectionError)
+                            if (_mainWindow.GetConnectionError(i))
                                 SendMessage(_clients[i].Socket, "Connection error");
                             else SendMessage(_clients[i].Socket, message);
                         }
                     }
                 }
-                    
+
             }
             catch (Exception ex)
             {

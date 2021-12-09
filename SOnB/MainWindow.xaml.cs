@@ -18,12 +18,14 @@ namespace SOnB
         private readonly Thread _communicationThread;
         private CRCMessageLogic _crcMessageLogic;
         private Server _server;
+        private int _minClients;
         String port;
         readonly ObservableCollection<ClientThreadModelInfo> threadModelInfos;
         
-        public MainWindow(string port, string title) : this(port)
+        public MainWindow(string port, string title, int minClients) : this(port)
         {
             this.Title = title;
+            this._minClients = minClients;
         }
         public MainWindow(string port)
         {
@@ -67,9 +69,39 @@ namespace SOnB
             });
         }
 
+        public bool GetBitChangeError(int i)
+        {
+            bool error = false;
+            this.Dispatcher.Invoke(() =>
+            {
+                error = threadModelInfos[i].IsBitChangeError;
+            });
+            return error;
+        }
+
+        public bool GetRepeatAnswearError(int i)
+        {
+            bool error = false;
+            this.Dispatcher.Invoke(() =>
+            {
+                error = threadModelInfos[i].IsRepeatAnswearError;
+            });
+            return error;
+        }
+
+        public bool GetConnectionError(int i)
+        {
+            bool error = false;
+            this.Dispatcher.Invoke(() =>
+            {
+                error = threadModelInfos[i].IsConnectionError;
+            });
+            return error;
+        }
+
         private void StartServer()
         {
-            this._server = new Server(this.port);
+            this._server = new Server(this.port, this._minClients);
             this.Dispatcher.Invoke(() =>
             {
                 ServerPortLabel.Content += " " + _server.GetPort();
@@ -117,7 +149,12 @@ namespace SOnB
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
-            this._server.SendMessageToAllClients(MessageBox.Text, threadModelInfos);
+            string message = MessageBox.Text;
+            Thread senderThread = new Thread(() => _server.SendMessageToAllClients(message, threadModelInfos))
+            {
+                IsBackground = true
+            };
+            senderThread.Start();
         }
 
 
