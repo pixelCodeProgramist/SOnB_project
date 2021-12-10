@@ -33,7 +33,10 @@ namespace SOnB.Client
                         break;
                     Console.WriteLine(Thread.CurrentThread.Name + " " + responseMessage.Message);
                     if (responseMessage.Message.Equals("Connection error"))
+                    {
                         ChangeServer();
+                        break;
+                    }
 
                     responseMessagesList.Add(responseMessage);
                     if (IsListContainsTwoMessages())
@@ -41,7 +44,10 @@ namespace SOnB.Client
                         if (IsLastTwoMessagesEquals())
                         {
                             if (IsServerSendsSameMessage(5))
+                            {
                                 ChangeServer();
+                                break;
+                            }
                         }
                         else
                         {
