@@ -1,4 +1,5 @@
 ﻿using Connection;
+using SOnB_Client.Connection;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -23,22 +24,23 @@ namespace SOnB.Client
         {
             if (tcpConnection.Connect(port))
             {
-                Console.WriteLine("Connected to port " + port);
+                Console.WriteLine(Thread.CurrentThread.Name + ": connected to port " + port);
 
                 while (true)
                 {
-                    if ((responseMessage = tcpConnection.ReceiveMessage()) == null)
+                    responseMessage = tcpConnection.ReceiveMessage();
+                    if (responseMessage == null || responseMessage.Type == MessageType.CommunicationClosed)
                         break;
                     Console.WriteLine(Thread.CurrentThread.Name + " " + responseMessage.Message);
                     if (responseMessage.Message.Equals("Connection error"))
                         ChangeServer();
 
                     responseMessagesList.Add(responseMessage);
-                    if (responseMessagesList.Count > 1)
+                    if (IsListContainsTwoMessages())
                     {
-                        if (responseMessagesList[responseMessagesList.Count - 2].Message == responseMessagesList[responseMessagesList.Count - 1].Message)
+                        if (IsLastTwoMessagesEquals())
                         {
-                            if (responseMessagesList.Count > 4)
+                            if (IsServerSendsSameMessage(5))
                                 ChangeServer();
                         }
                         else
@@ -52,12 +54,27 @@ namespace SOnB.Client
                 }
             }
             else
-                Console.WriteLine("Connection error");
+                Console.WriteLine(Thread.CurrentThread.Name + ": connection error");
+        }
+
+        private bool IsListContainsTwoMessages()
+        {
+            return responseMessagesList.Count > 1;
+        }
+
+        private bool IsLastTwoMessagesEquals()
+        {
+            return responseMessagesList[responseMessagesList.Count - 2].Message == responseMessagesList[responseMessagesList.Count - 1].Message;
+        }
+
+        private bool IsServerSendsSameMessage(int messageCount)
+        {
+            return responseMessagesList.Count >= messageCount;
         }
 
         private void ChangeServer()
         {
-            Thread.Sleep(200);
+            Thread.Sleep(1000);
             tcpConnection.GetSocket().Close();
             DoWork(8001);
         }

@@ -1,5 +1,5 @@
-﻿using Communication;
-using Connection;
+﻿using Connection;
+using SOnB_Client.Connection;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -10,7 +10,7 @@ namespace SOnB.Client
     public class TcpConnection
     {
         private Socket _socket;
-        private ICommunication _iCommunication;
+        private MessageType _messageType;
 
         public Boolean Connect(int port)
         {
@@ -65,10 +65,11 @@ namespace SOnB.Client
                 int ret = _socket.Receive(receivedBytes);
                 string tmp = null;
                 tmp = Encoding.UTF8.GetString(receivedBytes, 0, ret);
+                _messageType = MessageTypeUtility.GetMessage(tmp);
 
                 responseMessage = new ResponseMessage
                 {
-                    ICommunicationType = _iCommunication,
+                    Type = _messageType,
                     Message = tmp,
                     ReceivedBytes = receivedBytes
                 };

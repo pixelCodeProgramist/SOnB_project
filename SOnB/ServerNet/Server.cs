@@ -106,7 +106,7 @@ namespace SOnBServer
                             {
                                 SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
                                 messageStr = ReceiveMessage(client);
-                                _mainWindow.UpdateLogs(messageStr);
+                                _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
                             }
                         }
                         catch (SocketException ex)
@@ -163,7 +163,7 @@ namespace SOnBServer
                     {
                         if (_mainWindow.GetRepeatAnswearError(i))
                         {
-                            for (int number = 0; number < 5; number++)
+                            for (int number = 1; number <= 5; number++)
                             {
                                 SendMessage(_clients[i].Socket, message);
                                 Thread.Sleep(200);

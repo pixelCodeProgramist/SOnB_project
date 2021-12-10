@@ -1,4 +1,4 @@
-﻿using Communication;
+﻿using SOnB_Client.Connection;
 
 namespace Connection
 {
@@ -16,7 +16,7 @@ namespace Connection
             set;
         }
 
-        public ICommunication ICommunicationType
+        public MessageType Type
         {
             get;
             set;

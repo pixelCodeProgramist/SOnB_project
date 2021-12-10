@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientMain.cs" />
-    <Compile Include="Communication\ICommunication.cs" />
+    <Compile Include="Connection\MessageType.cs" />
     <Compile Include="Connection\ResponseMessage.cs" />
     <Compile Include="Connection\TcpConnection.cs" />
     <Compile Include="CRCAlgorithm.cs" />
