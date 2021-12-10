@@ -21,12 +21,9 @@ namespace SOnBServer
         private const int _MaxClients = 10;
         private MainWindow _mainWindow;
         private readonly List<ClientThreadModelInfo> _clients;
-        private Thread _addClientThread;
-        private int _minClients;
-
-        public Server(string port, int maxClients)
+        
+        public Server(string port)
         {
-            this._minClients = maxClients;
             this._listnerPort = SetPort(port);
             _clients = new List<ClientThreadModelInfo>();
         }
@@ -57,70 +54,62 @@ namespace SOnBServer
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
             socket.Bind(endpoint);
             socket.Listen(_MaxClients);
-            this._addClientThread = new Thread(() => this.AddAllClients(socket));
-            this._addClientThread.IsBackground = true;
-            this._addClientThread.Start();
             while (true)
             {
-                while (_clients.Count() > _minClients)
-                {
-                    TryReciveMessageFromClients();
-                }
+                ClientThreadModelInfo client = AddAllClients(socket);
+                Thread clientThread = new Thread(() => TryReciveMessage(client));
+                clientThread.IsBackground = true;
+                clientThread.Start();
             }
         }
 
-        private void AddAllClients(Socket socket)
+        private ClientThreadModelInfo AddAllClients(Socket socket)
         {
-            _counter = 0;
-            while (true)
-            {
-                _counter++;
-                Socket client = socket.Accept();
-                ClientThreadModelInfo clientInfo = new ClientThreadModelInfo(_counter.ToString(), client);
-                _clients.Add(clientInfo);
-                _mainWindow.UpdateListOfSockets(clientInfo);
-            }
+            _counter++;
+            Socket client = socket.Accept();
+            ClientThreadModelInfo clientInfo = new ClientThreadModelInfo(_counter.ToString(), client);
+            _clients.Add(clientInfo);
+            _mainWindow.UpdateListOfSockets(clientInfo);
+            return clientInfo;
         }
 
-        private void TryReciveMessageFromClients()
+        private void TryReciveMessage(ClientThreadModelInfo client)
         {
             while (true)
             {
                 try
                 {
-                    for (int i = 0; i < _clients.Count; i++)
+                    try
                     {
-                        ClientThreadModelInfo client = _clients[i];
-                        try
+                        String messageStr = ReceiveMessage(client);
+                        if (client.SocketId == "1" || client.SocketId == "2" || client.SocketId == "3")
+                            Console.WriteLine("");
+                        if (messageStr.Trim() == "")
                         {
-                            String messageStr = ReceiveMessage(client);
-                            if (messageStr.Trim() == "")
-                            {
-                                HandleException(client);
-                                i = -1;
-                                Thread.Sleep(200);
-                                continue;
-                            }
-                            _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
-                            if (IsMessageContainError(messageStr))
-                            {
-                                SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
-                                messageStr = ReceiveMessage(client);
-                                _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
-                            }
-                        }
-                        catch (SocketException ex)
-                        {
-                            Console.WriteLine(ex.Message);
                             HandleException(client);
-                            continue;
+                            Thread.Sleep(200);
+                            break;
                         }
-                        catch (Exception ex)
+                        _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
+                        if (IsMessageContainError(messageStr))
                         {
-                            Console.WriteLine(ex.Message);
-                            continue;
+                            SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
+                            messageStr = ReceiveMessage(client);
+                            _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
                         }
                     }
+                    catch (SocketException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        HandleException(client);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        break;
+                    }
+
                 }
                 catch (Exception ex)
                 {

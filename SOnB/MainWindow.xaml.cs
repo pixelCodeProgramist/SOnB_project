@@ -18,16 +18,14 @@ namespace SOnB
         private readonly Thread _communicationThread;
         private CRCMessageLogic _crcMessageLogic;
         private Server _server;
-        private int _minClients;
         String port;
         readonly ObservableCollection<ClientThreadModelInfo> threadModelInfos;
         private bool CheckBoxEnabled;
         
-        public MainWindow(string port, string title, int minClients) : this(port)
+        public MainWindow(string port, string title) : this(port)
         {
             this.Title = title;
             this.CheckBoxEnabled = title == "Slave server" ? false : true;
-            this._minClients = minClients;
         }
         public MainWindow(string port)
         {
@@ -104,7 +102,7 @@ namespace SOnB
 
         private void StartServer()
         {
-            this._server = new Server(this.port, this._minClients);
+            this._server = new Server(this.port);
             this.Dispatcher.Invoke(() =>
             {
                 ServerPortLabel.Content += " " + _server.GetPort();
