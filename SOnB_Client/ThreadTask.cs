@@ -34,6 +34,7 @@ namespace SOnB.Client
                     Console.WriteLine(Thread.CurrentThread.Name + " " + responseMessage.Message);
                     if (responseMessage.Message.Equals("Connection error"))
                     {
+                        responseMessagesList.Clear();
                         ChangeServer();
                         break;
                     }
@@ -45,6 +46,7 @@ namespace SOnB.Client
                         {
                             if (IsServerSendsSameMessage(5))
                             {
+                                responseMessagesList.Clear();
                                 ChangeServer();
                                 break;
                             }

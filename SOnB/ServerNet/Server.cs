@@ -3,6 +3,7 @@ using SOnB.Business;
 using SOnB.Business.MessageBitDestroyerFolder;
 using SOnB.Model;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -20,12 +21,12 @@ namespace SOnBServer
         private int _counter = 0;
         private const int _MaxClients = 10;
         private MainWindow _mainWindow;
-        private readonly List<ClientThreadModelInfo> _clients;
-        
+        private readonly ConcurrentDictionary<string, ClientThreadModelInfo> _clients;
+
         public Server(string port)
         {
             this._listnerPort = SetPort(port);
-            _clients = new List<ClientThreadModelInfo>();
+            _clients = new ConcurrentDictionary<string, ClientThreadModelInfo>();
         }
 
         public String GetPort()
@@ -57,8 +58,10 @@ namespace SOnBServer
             while (true)
             {
                 ClientThreadModelInfo client = AddAllClients(socket);
-                Thread clientThread = new Thread(() => TryReciveMessage(client));
-                clientThread.IsBackground = true;
+                Thread clientThread = new Thread(() => TryReciveMessage(client))
+                {
+                    IsBackground = true
+                };
                 clientThread.Start();
             }
         }
@@ -68,7 +71,7 @@ namespace SOnBServer
             _counter++;
             Socket client = socket.Accept();
             ClientThreadModelInfo clientInfo = new ClientThreadModelInfo(_counter.ToString(), client);
-            _clients.Add(clientInfo);
+            _clients.TryAdd(clientInfo.SocketId, clientInfo);
             _mainWindow.UpdateListOfSockets(clientInfo);
             return clientInfo;
         }
@@ -79,37 +82,26 @@ namespace SOnBServer
             {
                 try
                 {
-                    try
+                    String messageStr = ReceiveMessage(client);
+                    if (messageStr.Trim() == "")
                     {
-                        String messageStr = ReceiveMessage(client);
-                        if (client.SocketId == "1" || client.SocketId == "2" || client.SocketId == "3")
-                            Console.WriteLine("");
-                        if (messageStr.Trim() == "")
-                        {
-                            HandleException(client);
-                            Thread.Sleep(200);
-                            break;
-                        }
-                        _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
-                        if (IsMessageContainError(messageStr))
-                        {
-                            SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
-                            messageStr = ReceiveMessage(client);
-                            _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
-                        }
-                    }
-                    catch (SocketException ex)
-                    {
-                        Console.WriteLine(ex.Message);
                         HandleException(client);
+                        Thread.Sleep(200);
                         break;
                     }
-                    catch (Exception ex)
+                    _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
+                    if (IsMessageContainError(messageStr))
                     {
-                        Console.WriteLine(ex.Message);
-                        break;
+                        SendMessage(client.Socket, new CRCMessageLogic(this._mainWindow.GetDataFromTextBox()).GetMessage());
+                        messageStr = ReceiveMessage(client);
+                        _mainWindow.UpdateLogs("Socket:" + client.SocketId + " " + messageStr);
                     }
-
+                }
+                catch (SocketException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    HandleException(client);
+                    break;
                 }
                 catch (Exception ex)
                 {
@@ -140,29 +132,29 @@ namespace SOnBServer
         {
             try
             {
-                for (int i = 0; i < _clients.Count; i++)
+                foreach (var client in _clients)
                 {
                     Thread.Sleep(100);
-                    if (_mainWindow.GetBitChangeError(i))
+                    if (client.Value.IsBitChangeError)
                     {
                         MessageBitDestroyer messageBitDestroy = new MessageBitDestroyer(message);
-                        SendMessage(_clients[i].Socket, messageBitDestroy.destroy());
+                        SendMessage(client.Value.Socket, messageBitDestroy.destroy());
                     }
                     else
                     {
-                        if (_mainWindow.GetRepeatAnswearError(i))
+                        if (client.Value.IsRepeatAnswearError)
                         {
                             for (int number = 1; number <= 5; number++)
                             {
-                                SendMessage(_clients[i].Socket, message);
-                                Thread.Sleep(200);
+                                SendMessage(client.Value.Socket, message);
+                                Thread.Sleep(300);
                             }
                         }
                         else
                         {
-                            if (_mainWindow.GetConnectionError(i))
-                                SendMessage(_clients[i].Socket, "Connection error");
-                            else SendMessage(_clients[i].Socket, message);
+                            if (client.Value.IsConnectionError)
+                                SendMessage(client.Value.Socket, "Connection error");
+                            else SendMessage(client.Value.Socket, message);
                         }
                     }
                 }
@@ -176,8 +168,11 @@ namespace SOnBServer
 
         private void HandleException(ClientThreadModelInfo client)
         {
-            _clients.Remove(client);
+            bool result = false;
             _mainWindow.RemoveSocketFromList(client);
+            while (!result)
+                result = _clients.TryRemove(client.SocketId, out client);
+            Console.WriteLine(client);
         }
     }
 }

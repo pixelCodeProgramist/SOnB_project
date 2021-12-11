@@ -50,16 +50,5 @@ namespace SOnB.Model
             get;
             set;
         }
-        
-        public override bool Equals(object obj)
-        {
-            return obj is ClientThreadModelInfo info &&
-                   SocketId == info.SocketId;
-        }
-
-        public override int GetHashCode()
-        {
-            return 37337545 + EqualityComparer<string>.Default.GetHashCode(SocketId);
-        }
     }
 }
